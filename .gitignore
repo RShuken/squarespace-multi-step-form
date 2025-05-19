@@ -1,0 +1,67 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+!.env.local.sample
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+
+# Local development
+.env.local
+
+# Node dependencies (if any in the future)
+node_modules/
+
+# Build directories
+build/
+dist/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Local development settings
+local_settings.py
+
+# SQLite databases
+*.sqlite3
+
+# Jupyter Notebook
+.ipynb_checkpoints
