@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Step Form Test</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --background-color: #f3f4f6;
+            --text-color: #1f2937;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.5;
+            color: var(--text-color);
+            margin: 0;
+            padding: 2rem;
+            background-color: var(--background-color);
+        }
+
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Romantic Hearts Progress Bar */
+        .progress-container {
+            width: 100%;
+            margin: 3rem 0;
+            padding: 0 1rem;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+            color: #9f7aea;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background-color: #f3e8ff;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 2px 10px rgba(159, 122, 234, 0.2);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ec4899, #8b5cf6);
+            border-radius: 20px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 0%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-fill::after {
+            content: '❤';
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            opacity: 0.8;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(-50%) translateY(-5px); }
+            50% { transform: translateY(-50%) translateY(5px); }
+        }
+
+        .form-content {
+            margin-bottom: 2rem;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        .youtube-video-container {
+            margin-bottom: 1.5rem;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .youtube-video-container iframe {
+            width: 100%;
+            height: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-group select {
+            padding-right: 2.5rem;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236B7280'%3E%3Cpath d='M15.3 9.3a1 1 0 011.4 1.4l-4 4a1 1 0 01-1.4 0l-4-4a1 1 0 011.4-1.4l3.3 3.29 3.3-3.3z'/%3E%3C/svg%3E") no-repeat right 1rem center;
+            background-size: 1rem;
+        }
+
+        .form-group.error input,
+        .form-group.error textarea,
+        .form-group.error select {
+            border-color: var(--error-color);
+        }
+
+        .form-group.error .error-message {
+            display: block;
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 10px rgba(159, 122, 234, 0.2);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3));
+            transform: translateX(-100%);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn:hover::before {
+            transform: translateX(100%);
+        }
+
+        .btn-prev {
+            background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+            color: #7e22ce;
+            border: 1px solid #d8b4fe;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(159, 122, 234, 0.3);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(159, 122, 234, 0.2);
+        }
+
+        .thank-you-screen {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .celebration-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        @media (max-width: 640px) {
+            .form-container {
+                margin: 1rem;
+                padding: 1rem;
+            }
+
+            .navigation-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="multiStepFormContainer" class="form-container">
+        <!-- Romantic Hearts Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-header">
+                <span id="progressText">Step 1 of 22</span>
+            </div>
+            <div class="progress-bar">
+                <div id="progressBarFill" class="progress-fill"></div>
+            </div>
+        </div>
+
+        <form id="multiStepForm" style="display: block;">
+            <!-- Form steps will be dynamically generated here -->
+        </form>
+
+        <div id="navigationContainer" class="navigation-container mt-8 flex justify-between items-center" style="gap: 1.5rem;">
+            <div class="flex-1">
+                <button type="button" id="prevBtn" class="btn btn-prev" style="display: none;">← Previous</button>
+            </div>
+            <div class="flex-1 text-right">
+                <button type="button" id="nextBtn" class="btn btn-next">Next →</button>
+            </div>
+        </div>
+
+        <div id="thankYouScreen" class="thank-you-screen hidden">
+            <h2 class="text-3xl font-semibold text-green-600 mb-4">Thank You & Congratulations!</h2>
+            <p class="text-gray-700 text-lg">Your responses have been successfully submitted.</p>
+            <p class="text-gray-600 mt-2">We will be in touch shortly.</p>
+        </div>
+
+        <canvas id="celebrationCanvas" class="celebration-canvas"></canvas>
+    </div>
+
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@latest/dist/confetti.browser.js"></script>
+    <script>
+        // Configuration
+        const API_ENDPOINT = 'http://localhost:5001/api/submit-form';
+
+        // Global variables
+        let currentStep = 1;
+        let totalSteps = 0;
+        let formData = {};
+
+        // Question definitions
+        const formQuestions = [
+            {
+                id: 'dating_goals',
+                text: 'What are you looking for in a relationship right now?',
+                type: 'textarea',
+                required: true,
+                placeholder: 'Are you looking for something casual, a serious relationship, or still figuring it out?',
+                videoId: 'dQw4w9WgXcQ', // Add your YouTube video ID here
+                isMilestone: true,  // This will trigger celebration
+            },
+            {
+                id: 'step1',
+                text: 'Press Next after watching this Video',
+                // type: 'textarea',
+                required: false,
+                placeholder: 'Are you looking for something casual, a serious relationship, or still figuring it out?',
+                videoId: 'dQw4w9WgXcQ', // Add your YouTube video ID here
+                isMilestone: true,  // This will trigger celebration
+            },
+            {
+                id: 'ideal_partner',
+                text: 'Describe your ideal partner in detail',
+                type: 'textarea',
+                required: true,
+                placeholder: 'What qualities, values, and characteristics are you looking for in a partner?',
+                videoId: 'dQw4w9WgXcQ' // Add your YouTube video ID here
+            },
+            {
+                id: 'deal_breakers',
+                text: 'What are your absolute deal-breakers in a relationship?',
+                type: 'textarea',
+                required: true,
+                placeholder: 'What would make you immediately stop seeing someone?'
+            },
+            {
+                id: 'love_language',
+                text: 'What is your love language and how do you prefer to receive affection?',
+                type: 'textarea',
+                required: true,
+                placeholder: 'Words of affirmation, quality time, receiving gifts, acts of service, or physical touch?'
+            },
+            {
+                id: 'communication_style',
+                text: 'How do you typically communicate in relationships?',
+                type: 'textarea',
+                required: true,
+                placeholder: 'Are you direct or more subtle? How do you handle conflicts?'
+            },
+            {
+                id: 'dating_story',
+                text: 'What has your dating experience been like so far?',
+                type: 'textarea',
+                required: true,
+                placeholder: 'Share a bit about your past relationships and what you\'ve learned from them'
+            },
+            {
+                id: 'relationship_needs',
+                text: 'What do you need from a partner to feel loved and secure?',
+                type: 'textarea',
+                required: true,
+                placeholder: 'Be specific about your emotional needs in a relationship'
+            },
+            {
+                id: 'personal_growth',
+                text: 'How do you work on personal growth and self-improvement?',
+                type: 'textarea',
+                required: true,
+                placeholder: 'What are you doing to become the best version of yourself?'
+            },
+            {
+                id: 'life_vision',
+                text: 'Where do you see yourself in 5 years?',
+                type: 'textarea',
+                required: true,
+                placeholder: 'Share your vision for your personal and professional life'
+            },
+            {
+                id: 'values',
+                text: 'What core values are non-negotiable for you in a relationship?',
+                type: 'textarea',
+                required: true,
+                placeholder: 'What principles must your partner share with you?'
+            },
+            {
+                id: 'interests',
+                text: 'What are your main interests and hobbies?',
+                type: 'textarea',
+                required: true,
+                placeholder: 'What do you love to do in your free time?'
+            },
+            {
+                id: 'ideal_date',
+                text: 'Describe your perfect date',
+                type: 'textarea',
+                required: true,
+                placeholder: 'What would make an ideal first date for you?'
+            },
+            {
+                id: 'emotional_availability',
+                text: 'How emotionally available are you right now?',
+                type: 'textarea',
+                required: true,
+                placeholder: 'Are you ready to fully invest in a new relationship?'
+            },
+            {
+                id: 'intimacy',
+                text: 'How do you feel about physical intimacy in a relationship?',
+                type: 'textarea',
+                required: true,
+                placeholder: 'What are your thoughts on physical connection and when it should develop?'
+            },
+            {
+                id: 'conflict_resolution',
+                text: 'How do you typically handle disagreements in a relationship?',
+                type: 'textarea',
+                required: true,
+                placeholder: 'Describe your approach to resolving conflicts'
+            },
+            {
+                id: 'lifestyle',
+                text: 'Describe your daily lifestyle and routine',
+                type: 'textarea',
+                required: true,
+                placeholder: 'What does a typical day or week look like for you?'
+            },
+            {
+                id: 'social_life',
+                text: 'How do you like to spend your social time?',
+                type: 'textarea',
+                required: true,
+                placeholder: 'Do you prefer going out, staying in, or a mix of both?'
+            },
+            {
+                id: 'future_goals',
+                text: 'What are your relationship goals for the future?',
+                type: 'textarea',
+                required: true,
+                placeholder: 'Where would you like this relationship to go?'
+            },
+            {
+                id: 'personal_values',
+                text: 'What personal values guide your life choices?',
+                type: 'textarea',
+                required: true,
+                placeholder: 'What principles are most important to you in life?'
+            },
+            {
+                id: 'additional_info',
+                text: 'Is there anything else you\'d like potential matches to know about you?',
+                type: 'textarea',
+                required: false,
+                placeholder: 'Share any other important information about yourself',
+                validation: { required: true, minLength: 50 },
+                isMilestone: true
+            },
+            {
+                id: 'consent',
+                text: 'I agree to the terms and conditions',
+                type: 'select',
+                options: [
+                    { value: 'agree', text: 'I Agree' }
+                ],
+                validation: { required: true }
+            }
+        ];
+
+        totalSteps = formQuestions.length;
+
+        // DOM Elements
+        const formElement = document.getElementById('multiStepForm');
+        const formContainer = document.getElementById('multiStepFormContainer');
+        const progressBar = document.getElementById('progressBarFill');
+        const progressText = document.getElementById('progressText');
+        const progressPercentage = document.getElementById('progressPercentage');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const thankYouScreen = document.getElementById('thankYouScreen');
+        const celebrationCanvas = document.getElementById('celebrationCanvas');
+
+        // Initialize app
+        function initApp() {
+            // Initialize form data first
+            formQuestions.forEach(question => {
+                if (formData[question.id] === undefined) {
+                    formData[question.id] = '';
+                }
+            });
+            
+            // Load saved progress (this will override the empty strings if there's saved data)
+            loadProgress();
+            
+            // Generate form HTML
+            generateFormStepsHTML();
+            
+            // Show first step
+            showStep(1);
+            
+            // Update UI
+            updateProgressBar();
+            updateNavigationButtons();
+            
+            // Ensure form is visible and thank you is hidden
+            formElement.style.display = 'block';
+            if (document.getElementById('navigationContainer')) {
+                document.getElementById('navigationContainer').style.display = 'flex';
+            }
+            if (document.getElementById('progressBarContainer')) {
+                document.getElementById('progressBarContainer').style.display = 'block';
+            }
+            if (document.getElementById('thankYouScreen')) {
+                document.getElementById('thankYouScreen').style.display = 'none';
+            }
+            
+            // Event listeners
+            if (prevBtn) prevBtn.addEventListener('click', prevStep);
+            if (nextBtn) nextBtn.addEventListener('click', nextStep);
+        }
+
+        // Generate form steps HTML
+        function generateFormStepsHTML() {
+            formElement.innerHTML = '';
+            
+            formQuestions.forEach((question, index) => {
+                const stepHtml = createStepHTML(question, index + 1);
+                formElement.insertAdjacentHTML('beforeend', stepHtml);
+            });
+            
+            // Add event listeners after all elements are in the DOM
+            setupEventListeners();
+        }
+        
+        // Set up event listeners for form inputs
+        function setupEventListeners() {
+            formQuestions.forEach(question => {
+                const inputElement = document.getElementById(question.id);
+                if (inputElement) {
+                    // Remove any existing listeners to prevent duplicates
+                    const newInput = inputElement.cloneNode(true);
+                    inputElement.parentNode.replaceChild(newInput, inputElement);
+                    
+                    // Add new event listener
+                    newInput.addEventListener('input', (e) => {
+                        formData[question.id] = e.target.value;
+                        saveProgress();
+                    });
+                    
+                    // Set the value from formData if it exists
+                    if (formData[question.id] !== undefined) {
+                        newInput.value = formData[question.id];
+                    }
+                }
+            });
+        }
+
+        // Create HTML for a single step
+        function createStepHTML(question, stepNumber) {
+            let stepHtml = `<div class="form-step" data-step="${stepNumber}">`;
+            
+            // Add video container if videoId exists
+            if (question.videoId) {
+                stepHtml += `
+                    <div class="youtube-video-container mb-4" id="videoContainer_${question.id}">
+                        <iframe src="https://www.youtube-nocookie.com/embed/${question.videoId}"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen></iframe>
+                    </div>
+                `;
+            }
+            
+            // Add question text
+            stepHtml += `<h3 class="text-xl font-semibold mb-3">${question.text}</h3>`;
+            
+            // Add form group
+            stepHtml += `<div class="form-group" id="group_${question.id}">`;
+            
+            // Get existing value if it exists
+            const existingValue = formData[question.id] || '';
+            
+            // Add input based on type
+            switch(question.type) {
+                case 'text':
+                case 'email':
+                case 'tel':
+                case 'number':
+                    stepHtml += `
+                        <input type="${question.type}" 
+                               id="${question.id}" 
+                               name="${question.id}" 
+                               value="${existingValue}"
+                               placeholder="${question.placeholder || ''}" 
+                               class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    `;
+                    break;
+                    
+                case 'textarea':
+                    stepHtml += `
+                        <textarea id="${question.id}" 
+                                  name="${question.id}" 
+                                  placeholder="${question.placeholder || ''}" 
+                                  class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                  rows="4">${existingValue}</textarea>
+                    `;
+                    break;
+                    
+                case 'select':
+                    stepHtml += `
+                        <select id="${question.id}" 
+                                name="${question.id}" 
+                                class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    `;
+                    question.options.forEach(option => {
+                        const selected = existingValue === option.value ? 'selected' : '';
+                        stepHtml += `<option value="${option.value}" ${selected}>${option.text}</option>`;
+                    });
+                    stepHtml += `</select>`;
+                    break;
+            }
+            
+            // Add error message container
+            stepHtml += `<div id="error_${question.id}" class="error-message text-red-500 text-sm mt-1"></div>`;
+            
+            stepHtml += '</div></div>';
+            
+            return stepHtml;
+        }
+
+        // Handle input changes
+        function handleInputChange(event, question) {
+            formData[question.id] = event.target.value;
+            saveProgress();
+        }
+
+        // Show a specific step
+        function showStep(stepNumber) {
+            currentStep = stepNumber;
+            
+            // Hide all steps first
+            const steps = document.querySelectorAll('.form-step');
+            steps.forEach(step => {
+                step.style.display = 'none';
+            });
+            
+            // Show current step
+            const currentStepElement = document.querySelector(`.form-step[data-step="${stepNumber}"]`);
+            if (currentStepElement) {
+                currentStepElement.style.display = 'block';
+                
+                // Update UI
+                updateProgressBar();
+                updateNavigationButtons();
+                
+                // Scroll to top of form
+                setTimeout(() => {
+                    currentStepElement.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start',
+                        inline: 'nearest'
+                    });
+                }, 50);
+            }
+        }
+
+        // Update progress bar
+        function updateProgressBar() {
+            const percentage = Math.round(((currentStep - 1) / (totalSteps - 1)) * 100);
+            progressText.textContent = `Step ${currentStep} of ${totalSteps}`;
+            
+            // Update progress bar width with smooth animation
+            const progressBarFill = document.getElementById('progressBarFill');
+            if (progressBarFill) {
+                // Force reflow to ensure the transition works
+                void progressBarFill.offsetWidth;
+                // Set the new width with transition
+                progressBarFill.style.width = `${percentage}%`;
+            }
+        }
+
+        // Update navigation buttons
+        function updateNavigationButtons() {
+            if (prevBtn) prevBtn.style.display = currentStep > 1 ? 'block' : 'none';
+            if (nextBtn) {
+                nextBtn.textContent = currentStep === totalSteps ? 'Submit' : 'Next';
+                nextBtn.style.display = 'block';
+            }
+        }
+
+        // Previous step
+        function prevStep() {
+            if (currentStep > 1) {
+                showStep(currentStep - 1);
+            }
+        }
+
+        // Next step
+        function nextStep() {
+            const currentQuestion = formQuestions[currentStep - 1];
+            
+            // Validate current step
+            if (!validateStep(currentQuestion)) {
+                return;
+            }
+            
+            // Save the current response
+            saveProgress();
+            
+            if (currentStep < totalSteps) {
+                // Move to next question
+                showStep(currentStep + 1);
+                
+                // Trigger celebration if this is a milestone step
+                if (currentQuestion.isMilestone) {
+                    triggerCelebration('milestone');
+                }
+            } else {
+                // If this was the last question, submit the form
+                handleSubmit();
+            }
+        }
+
+        // Validate current step
+        function validateStep(question) {
+            const inputElement = document.getElementById(question.id);
+            const value = inputElement ? inputElement.value : '';
+            let isValid = true;
+            
+            // Get or create error element
+            let group = document.getElementById(`group_${question.id}`);
+            let errorElement = group.querySelector('.error-message');
+            
+            // Remove existing error if any
+            if (errorElement) {
+                errorElement.remove();
+                group.classList.remove('error');
+            }
+            
+            if (question.validation) {
+                if (question.validation.required && (!value || value.trim() === '')) {
+                    isValid = false;
+                    addError(question.id, 'This field is required');
+                }
+                
+                if (isValid && question.validation.minLength && value.length < question.validation.minLength) {
+                    isValid = false;
+                    addError(question.id, `Minimum length is ${question.validation.minLength} characters`);
+                }
+                
+                if (isValid && question.validation.pattern && value && !new RegExp(question.validation.pattern).test(value)) {
+                    isValid = false;
+                    addError(question.id, 'Invalid format');
+                }
+                
+                if (isValid && question.validation.min !== undefined && value && parseFloat(value) < question.validation.min) {
+                    isValid = false;
+                    addError(question.id, `Minimum value is ${question.validation.min}`);
+                }
+                
+                if (isValid && question.validation.max !== undefined && value && parseFloat(value) > question.validation.max) {
+                    isValid = false;
+                    addError(question.id, `Maximum value is ${question.validation.max}`);
+                }
+            }
+            
+            // Update form data if valid
+            if (isValid) {
+                formData[question.id] = value;
+                saveProgress();
+            }
+            
+            return isValid;
+        }
+
+        // Add error message
+        function addError(fieldId, message) {
+            const group = document.getElementById(`group_${fieldId}`);
+            group.classList.add('error');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            group.appendChild(errorDiv);
+        }
+
+        // Handle form submission
+        function handleSubmit() {
+            // Show loading state on the next button
+            const nextButton = document.getElementById('nextBtn');
+            if (nextButton) {
+                nextButton.disabled = true;
+                const originalText = nextButton.textContent;
+                nextButton.textContent = 'Submitting...';
+            }
+            
+            // Submit the form data to the server
+            fetch(API_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    formData: formData,
+                    timestamp: new Date().toISOString()
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                
+                // Handle successful submission
+                formElement.style.display = 'none';
+                if (document.getElementById('navigationContainer')) {
+                    document.getElementById('navigationContainer').style.display = 'none';
+                }
+                if (document.getElementById('progressBarContainer')) {
+                    document.getElementById('progressBarContainer').style.display = 'none';
+                }
+                const thankYouScreen = document.getElementById('thankYouScreen');
+                if (thankYouScreen) {
+                    thankYouScreen.style.display = 'block';
+                    thankYouScreen.classList.remove('hidden');
+                }
+                triggerCelebration('final');
+                
+                // Clear the form data from localStorage
+                localStorage.removeItem('formProgress');
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('There was an error submitting the form. Please try again.');
+                
+                // Re-enable the next button
+                const nextButton = document.getElementById('nextBtn');
+                if (nextButton) {
+                    nextButton.disabled = false;
+                    nextButton.textContent = 'Submit';
+                }
+            });
+        }
+
+        // Trigger celebration effects
+        function triggerCelebration(type) {
+            if (typeof confetti === 'function') {
+                celebrationCanvas.style.display = 'block';
+                
+                let config = {
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                };
+                
+                if (type === 'final') {
+                    config = {
+                        particleCount: 200,
+                        spread: 160,
+                        origin: { y: 0.5 },
+                        angle: 90,
+                        drift: 0,
+                        gravity: 0.5,
+                        ticks: 400
+                    };
+                }
+                
+                confetti(config);
+                
+                // Hide canvas after effects
+                setTimeout(() => {
+                    celebrationCanvas.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Save progress to localStorage
+        function saveProgress() {
+            localStorage.setItem('multiStepFormData', JSON.stringify(formData));
+            localStorage.setItem('multiStepFormCurrentStep', currentStep);
+        }
+
+        // Load progress from localStorage
+        function loadProgress() {
+            const savedData = localStorage.getItem('multiStepFormData');
+            const savedStep = localStorage.getItem('multiStepFormCurrentStep');
+            
+            if (savedData && savedStep) {
+                const parsedData = JSON.parse(savedData);
+                // Only load saved data if it matches our current questions
+                const validKeys = formQuestions.map(q => q.id);
+                Object.entries(parsedData).forEach(([key, value]) => {
+                    if (validKeys.includes(key)) {
+                        formData[key] = value;
+                    }
+                });
+                
+                const step = parseInt(savedStep, 10);
+                currentStep = step >= 1 && step <= totalSteps ? step : 1;
+            } else {
+                currentStep = 1;
+            }
+            
+            // Initialize any missing fields with empty strings
+            formQuestions.forEach(question => {
+                if (formData[question.id] === undefined) {
+                    formData[question.id] = '';
+                }
+            });
+        }
+
+        // Initialize the app when DOM is loaded
+document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

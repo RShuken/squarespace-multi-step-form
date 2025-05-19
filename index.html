@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Multi-Step Form</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="multiStepFormContainer" class="form-container">
+        <div id="progressBarContainer" class="progress-container mb-6">
+            <div class="flex justify-between mb-1">
+                <span id="progressText" class="text-sm font-medium text-blue-700">Step 1 of N</span>
+                <span id="progressPercentage" class="text-sm font-medium text-blue-700">0%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div id="progressBar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <form id="multiStepForm" class="form-content">
+            <!-- Form steps will be dynamically generated here -->
+        </form>
+
+        <div id="navigationContainer" class="navigation-container mt-8 flex justify-between">
+            <button type="button" id="prevBtn" class="btn btn-prev hidden">Previous</button>
+            <button type="button" id="nextBtn" class="btn btn-next">Next</button>
+            <button type="submit" id="submitBtn" class="btn btn-submit hidden">Submit</button>
+        </div>
+
+        <div id="thankYouScreen" class="thank-you-screen hidden">
+            <h2 class="text-3xl font-semibold text-green-600 mb-4">Thank You & Congratulations!</h2>
+            <p class="text-gray-700 text-lg">Your responses have been successfully submitted.</p>
+            <p class="text-gray-600 mt-2">We will be in touch shortly.</p>
+        </div>
+
+        <canvas id="celebrationCanvas" class="celebration-canvas"></canvas>
+    </div>
+
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@latest/dist/confetti.browser.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
